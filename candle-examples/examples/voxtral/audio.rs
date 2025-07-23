@@ -100,6 +100,21 @@ pub fn load_audio_features(
     n_mels: usize,
     device: &Device,
 ) -> Result<Tensor> {
-    let (samples, _sr) = pcm_decode(audio_path)?;
+    println!("  - Decoding audio file: {}", audio_path);
+    let (samples, sample_rate) = pcm_decode(audio_path)?;
+    
+    let duration = samples.len() as f32 / sample_rate as f32;
+    let max_amplitude = samples.iter().map(|&x| x.abs()).fold(0.0f32, f32::max);
+    
+    println!("  - Sample rate: {} Hz", sample_rate);
+    println!("  - Duration: {:.2} seconds", duration);
+    println!("  - Samples: {}", samples.len());
+    println!("  - Max amplitude: {:.4}", max_amplitude);
+    
+    if max_amplitude < 0.001 {
+        println!("  - Warning: Very low audio levels detected");
+    }
+    
+    println!("  - Converting to mel-spectrogram...");
     to_mel_spectrogram(&samples, n_mels, device)
 }

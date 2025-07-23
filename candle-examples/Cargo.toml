@@ -35,6 +35,7 @@ serde = { workspace = true }
 serde_json = { workspace = true }
 symphonia = { version = "0.5.3", features = ["all"], optional = true }
 tokenizers = { workspace = true, features = ["onig"] }
+kitoken = "0.10.1"
 cpal = { version = "0.15.2", optional = true }
 pdf2image = { version = "0.1.2" , optional = true}
 
