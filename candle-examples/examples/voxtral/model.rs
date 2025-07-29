@@ -62,11 +62,6 @@ impl VoxtralModel {
         // Create cache
         let cache = VoxtralCache::new(true, DType::F16, &config.text_config, &device)?;
 
-        let mel_bytes = include_bytes!("melfilters128.bytes").as_slice();
-        let mut mel_filters = vec![0f32; mel_bytes.len() / 4];
-        let mut cursor = Cursor::new(mel_bytes);
-        cursor.read_f32_into::<LittleEndian>(&mut mel_filters)?;
-
         let audio_token_id = config.audio_token_id;
 
         Ok(Self {
@@ -88,24 +83,6 @@ impl VoxtralModel {
         audio_data: &[f32],
         sample_rate: u32,
     ) -> Result<TranscriptionResult> {
-        let (transcription, tokens) = self.transcribe_audio_internal(audio_data, sample_rate)?;
-
-        Ok(TranscriptionResult {
-            text: transcription,
-            tokens,
-        })
-    }
-
-    /// Internal transcribe method that returns both text and tokens
-    ///
-    /// # Errors
-    ///
-    /// Returns an error if the audio data cannot be transcribed.
-    fn transcribe_audio_internal(
-        &mut self,
-        audio_data: &[f32],
-        sample_rate: u32,
-    ) -> Result<(String, Vec<u32>)> {
         // Resample to 16kHz if needed
         let audio = if sample_rate == SAMPLE_RATE {
             audio_data.to_vec()
@@ -144,7 +121,10 @@ impl VoxtralModel {
             &self.cache.clone(),
         )?;
 
-        Ok((result, tokens))
+        Ok(TranscriptionResult {
+            text: result,
+            tokens,
+        })
     }
 
     pub fn device(&self) -> &Device {
