@@ -58,7 +58,7 @@ tokio = "1.48.0"
 
 [build-dependencies]
 anyhow = { workspace = true }
-bindgen_cuda = { version = "0.1.5", optional = true }
+bindgen_cuda = { git = "https://github.com/jorge-menjivar/bindgen_cuda.git", branch = "cuda-locations", optional = true }
 hf-hub = { workspace = true, features = ["tokio"] }
 
 [features]
